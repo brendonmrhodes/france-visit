@@ -208,3 +208,11 @@ ul.plain li:last-child { border-bottom: 0 }
 .lbcap { color: #fff; font-size: 13px } .lbcap a { color: #e2bf6a }
 .photo img { cursor: zoom-in }
 @media (max-width: 560px) { .tabs { gap: 2px } .tab { padding: 7px 10px; font-size: 13.5px } }
+
+/* Sort, bookings, car */
+.sortsel { font: inherit; font-size: 13px; padding: 5px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); margin-left: auto }
+.bookmark { color: var(--red); font-weight: 600 } .bookmark.done { color: var(--green) }
+.booktable tr.booked td { opacity: .7 } .booktable tr.booked td:first-child b { text-decoration: line-through; text-decoration-color: var(--green) }
+.booktable select, .booktable input.ref { font: inherit; font-size: 13px; padding: 5px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); min-width: 120px }
+.booktable input.ref { width: 100%; min-width: 140px }
+#countdown { color: var(--gold) }

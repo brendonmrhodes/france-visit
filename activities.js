@@ -4,7 +4,8 @@
    tags: xmas, ww2, indoor, outdoor, food, overnight, sweet, savory   closed: true grays a card out
    photo: a Wikimedia Commons file name (the part after "File:" in the file's URL). Leave it out for no photo.
    Food cards use origin + where instead of travel + time. ll = map pin [lat, lng]; budget = number used for the budget estimate (per person unless perGroup).
-   closedDates / closedBefore let the planner warn when something is shut on a chosen day. Prices were checked on official sites in late October 2026. */
+   closedDates / closedBefore let the planner warn when something is shut on a chosen day.
+   book: "sellout" (tickets run out, book the moment the day is fixed) or "advised" (timed slot or online-only ticket). Drives the Bookings list on the Plan tab. Prices were checked on official sites in late October 2026. */
 const AREAS = [
   { id: "paris", name: "Paris day trips", note: "40 min by train. Mix one big museum with a walk and a Christmas-lights evening. Cards marked Museum Pass are covered by the Paris Museum Pass (€85 for 2 days, €105 for 4); the Budget panel under Family picks works out whether it pays." },
   { id: "fbl", name: "Fontainebleau & nearby", note: "On our doorstep. Good for slower days, jet-lag days, and rainy days." },
@@ -16,19 +17,19 @@ const TAGS = { xmas: "Christmas", ww2: "WWII", indoor: "Rainy-day friendly", out
 
 const ACTIVITIES = [
   // ---------- PARIS ----------
-  { id: "eiffel", ll: [48.8584, 2.2945], budget: 36.7, photo: "Paris,_Eiffelturm_--_2014_--_1249.jpg", area: "paris", title: "Eiffel Tower", travel: "1 h door to door", time: "2–3 h", price: "€36.70 to the summit, €23.50 to the 2nd floor", tags: ["outdoor"],
+  { id: "eiffel", book: "sellout", ll: [48.8584, 2.2945], budget: 36.7, photo: "Paris,_Eiffelturm_--_2014_--_1249.jpg", area: "paris", title: "Eiffel Tower", travel: "1 h door to door", time: "2–3 h", price: "€36.70 to the summit, €23.50 to the 2nd floor", tags: ["outdoor"],
     blurb: "Go up to the summit or the 2nd floor. At night it sparkles for five minutes every hour on the hour.",
     dec: "Online sales open 60 days ahead and summit slots sell out, so book as soon as we pick a day. Going up around 16:30 gets daylight views and the lights coming on." },
-  { id: "louvre", ll: [48.8606, 2.3376], budget: 32, photo: "Louvre_Pyramid_and_Cour_Napoléon,_Paris.jpg", area: "paris", title: "The Louvre", travel: "50 min", time: "3–4 h", price: "€32 (the non-EU rate)", closedDays: "Closed Tue", tags: ["indoor"],
+  { id: "louvre", book: "advised", ll: [48.8606, 2.3376], budget: 32, photo: "Louvre_Pyramid_and_Cour_Napoléon,_Paris.jpg", area: "paris", title: "The Louvre", travel: "50 min", time: "3–4 h", price: "€32 (the non-EU rate)", closedDays: "Closed Tue", tags: ["indoor"],
     blurb: "The Mona Lisa, Venus de Milo and the old royal palace itself. Pick a wing rather than trying to see it all.",
     dec: "Timed entry is required. Wednesday and Friday evening openings are quieter. The ticket also covers the exhibitions and the little Delacroix museum." },
-  { id: "orsay", ll: [48.86, 2.3266], budget: 16, photo: "Paris_-_Musée_d'Orsay_-_big_clock_seen_from_the_interior.jpg", area: "paris", title: "Musée d'Orsay", travel: "50 min", time: "2–3 h", price: "€16 online, €14 at the door", closedDays: "Closed Mon", tags: ["indoor"],
+  { id: "orsay", book: "advised", ll: [48.86, 2.3266], budget: 16, photo: "Paris_-_Musée_d'Orsay_-_big_clock_seen_from_the_interior.jpg", area: "paris", title: "Musée d'Orsay", travel: "50 min", time: "2–3 h", price: "€16 online, €14 at the door", closedDays: "Closed Mon", tags: ["indoor"],
     blurb: "Impressionists in a grand old train station: Monet, Van Gogh, Renoir, Degas. Easier to enjoy than the Louvre.",
     dec: "Great rainy-day pick. A timed slot booked online is mandatory. Thursday evenings after 18:00 cost €12. A combined Orsay + Orangerie ticket is €20 at the museum." },
-  { id: "notredame", ll: [48.853, 2.3499], budget: 0, photo: "Facade_of_Notre-Dame_de_Paris.jpg", area: "paris", title: "Notre-Dame & Île de la Cité", travel: "45 min", time: "2 h", price: "Free (towers €16)", tags: ["indoor", "xmas"],
+  { id: "notredame", book: "advised", ll: [48.853, 2.3499], budget: 0, photo: "Facade_of_Notre-Dame_de_Paris.jpg", area: "paris", title: "Notre-Dame & Île de la Cité", travel: "45 min", time: "2 h", price: "Free (towers €16)", tags: ["indoor", "xmas"],
     blurb: "The cathedral reopened in December 2024 after the fire, looking brighter than it has in centuries.",
     dec: "Entry is free; reserve a free time slot on the official site or app a day or two ahead. The towers reopened in 2025 (€16, online only). Advent concerts, and a small Christmas market usually sets up nearby." },
-  { id: "saintechapelle", ll: [48.8554, 2.345], budget: 22, photo: "Sainte_Chapelle_Interior_Stained_Glass.jpg", area: "paris", title: "Sainte-Chapelle", travel: "45 min", time: "1 h", price: "€22 (the non-EU rate)", tags: ["indoor"],
+  { id: "saintechapelle", book: "advised", ll: [48.8554, 2.345], budget: 22, photo: "Sainte_Chapelle_Interior_Stained_Glass.jpg", area: "paris", title: "Sainte-Chapelle", travel: "45 min", time: "1 h", price: "€22 (the non-EU rate)", tags: ["indoor"],
     blurb: "A 13th-century chapel that is almost entirely stained glass. Five minutes' walk from Notre-Dame.",
     dec: "Go around midday when the low winter sun is strongest. Book a timed slot online. Free on Sunday 6 December (first Sunday of the month). Evening candlelit concerts are often scheduled." },
   { id: "montmartre", ll: [48.8867, 2.3431], budget: 0, photo: "Basilique_du_Sacré-Cœur_de_Montmartre_1.jpg", area: "paris", title: "Montmartre & Sacré-Cœur", travel: "1 h", time: "Half day", price: "Free (dome climb €8)", tags: ["outdoor", "food"],
@@ -40,7 +41,7 @@ const ACTIVITIES = [
   { id: "markets", ll: [48.8918, 2.2362], budget: 0, photo: "La_Défense_Christmas_market_-_2025-12-27.jpg", area: "paris", title: "Paris Christmas markets", travel: "45 min–1 h", time: "2–3 h", price: "Free to wander", tags: ["xmas", "food", "outdoor"],
     blurb: "Raclette, crêpes, hot chocolate and wooden chalets. La Défense hosts the biggest one; smaller markets pop up around the city.",
     dec: "Locations change each year. Brendon will confirm which markets are on in 2026." },
-  { id: "seine", ll: [48.8606, 2.293], budget: 18, photo: "Bateau_Mouche_on_river_Seine_near_the_Pont_d'Iéna_and_Eiffel_Tower_in_Paris,_France.jpg", area: "paris", title: "Seine river cruise", travel: "50 min", time: "1–3 h", price: "€18 for the 1-hour cruise; dinner cruise from €99", tags: ["outdoor", "food"],
+  { id: "seine", book: "advised", ll: [48.8606, 2.293], budget: 18, photo: "Bateau_Mouche_on_river_Seine_near_the_Pont_d'Iéna_and_Eiffel_Tower_in_Paris,_France.jpg", area: "paris", title: "Seine river cruise", travel: "50 min", time: "1–3 h", price: "€18 for the 1-hour cruise; dinner cruise from €99", tags: ["outdoor", "food"],
     blurb: "A one-hour sightseeing boat from the foot of the Eiffel Tower, or a dinner cruise past the lit-up monuments.",
     dec: "Boats are heated and glassed in. After dark is the best time in December. Dinner cruises need booking well ahead." },
   { id: "invalides", ll: [48.8566, 2.3125], budget: 17, photo: "Le_Dôme_des_Invalides.jpg", area: "paris", title: "Les Invalides & Army Museum", travel: "55 min", time: "2–3 h", price: "€17", tags: ["ww2", "indoor"],
@@ -55,19 +56,19 @@ const ACTIVITIES = [
   { id: "marais", ll: [48.8556, 2.3655], budget: 0, photo: "Place_des_Vosges,_Paris,_France.jpg", area: "paris", title: "Le Marais & a food walk", travel: "45 min", time: "Half day", price: "Free to walk", tags: ["food", "outdoor"],
     blurb: "Place des Vosges, falafel on rue des Rosiers, cheese and pastry shops. Could be a guided food tour.",
     dec: "Shops get busy on weekends before Christmas. Weekdays are calmer." },
-  { id: "catacombs", ll: [48.8339, 2.3324], budget: 31, photo: "Catacombes_de_Paris_1.JPG", area: "paris", title: "Catacombs", travel: "50 min", time: "1.5 h", price: "€31 with audio guide", closedDays: "Closed Mon", tags: ["indoor"],
+  { id: "catacombs", book: "sellout", ll: [48.8339, 2.3324], budget: 31, photo: "Catacombes_de_Paris_1.JPG", area: "paris", title: "Catacombs", travel: "50 min", time: "1.5 h", price: "€31 with audio guide", closedDays: "Closed Mon", tags: ["indoor"],
     blurb: "Tunnels under the city lined with the bones of six million Parisians. Strange and memorable.",
     dec: "Tickets are online only, released 7 days ahead, and sell out fast. Lots of stairs." },
-  { id: "garnier", ll: [48.8719, 2.3316], budget: 25, photo: "Paris_Opera_full_frontal_architecture,_May_2009.jpg", area: "paris", title: "Palais Garnier opera house", travel: "50 min", time: "1.5 h or a show", price: "€25 self-guided visit (the non-EU rate)", tags: ["indoor"],
+  { id: "garnier", book: "advised", ll: [48.8719, 2.3316], budget: 25, photo: "Paris_Opera_full_frontal_architecture,_May_2009.jpg", area: "paris", title: "Palais Garnier opera house", travel: "50 min", time: "1.5 h or a show", price: "€25 self-guided visit (the non-EU rate)", tags: ["indoor"],
     blurb: "Tour the gilded opera house with Chagall's ceiling, or book a ballet. December usually brings a big holiday production.",
     dec: "Visits are booked online only, 30 days ahead, non-refundable. Next door to Galeries Lafayette, so it combines well with the lights evening." },
-  { id: "versailles", ll: [48.8049, 2.1204], budget: 25, photo: "Chateau_Versailles_Galerie_des_Glaces.jpg", area: "paris", title: "Palace of Versailles", travel: "1 h 15 by car", time: "Full day", price: "€25 Passport (winter rate)", closedDays: "Closed Mon", tags: ["indoor", "outdoor"],
+  { id: "versailles", book: "advised", ll: [48.8049, 2.1204], budget: 25, photo: "Chateau_Versailles_Galerie_des_Glaces.jpg", area: "paris", title: "Palace of Versailles", travel: "1 h 15 by car", time: "Full day", price: "€25 Passport (winter rate)", closedDays: "Closed Mon", tags: ["indoor", "outdoor"],
     blurb: "The Hall of Mirrors, the King's apartments and the vast gardens. A full day on its own.",
     dec: "The Passport is now the only ticket that includes the palace, and it needs a timed slot. Gardens are free in winter but the fountains don't run. Arrive at opening." },
-  { id: "cabaret", ll: [48.8841, 2.3322], budget: 87, photo: "Paris,_Moulin_Rouge_--_2014_--_1220.jpg", area: "paris", title: "Cabaret show", travel: "1 h", time: "Evening", price: "From about €87 show only, €185 with dinner", tags: ["indoor", "food"],
+  { id: "cabaret", book: "sellout", ll: [48.8841, 2.3322], budget: 87, photo: "Paris,_Moulin_Rouge_--_2014_--_1220.jpg", area: "paris", title: "Cabaret show", travel: "1 h", time: "Evening", price: "From about €87 show only, €185 with dinner", tags: ["indoor", "food"],
     blurb: "Moulin Rouge or Lido-style dinner show. Feathers, cancan and a late dinner.",
     dec: "Prices move with demand and the 23:00 show is the cheapest. Late finish, so plan to drive or catch a late train home." },
-  { id: "orangerie", ll: [48.8638, 2.3226], budget: 12.5, photo: "Musée_de_l'Orangerie,_ninfee_di_Monet_01.JPG", area: "paris", title: "Orangerie & Tuileries", travel: "50 min", time: "1.5 h", price: "€12.50 online, €11 at the door", closedDays: "Closed Tue", tags: ["indoor"],
+  { id: "orangerie", book: "advised", ll: [48.8638, 2.3226], budget: 12.5, photo: "Musée_de_l'Orangerie,_ninfee_di_Monet_01.JPG", area: "paris", title: "Orangerie & Tuileries", travel: "50 min", time: "1.5 h", price: "€12.50 online, €11 at the door", closedDays: "Closed Tue", tags: ["indoor"],
     blurb: "Monet's huge Water Lilies in two oval rooms, then a walk through the Tuileries garden.",
     dec: "Since Giverny is closed in winter, this is the best Monet fix. Free on Sunday 6 December with an online slot." },
 
@@ -81,7 +82,7 @@ const ACTIVITIES = [
   { id: "barbizon", ll: [48.4451, 2.6054], budget: 8, photo: "BarbizonRue.jpg", area: "fbl", title: "Barbizon painters' village", travel: "15 min", time: "2 h", price: "Free to walk; painters' museum €8", closedDays: "Museum closed Tue", tags: ["food", "outdoor"],
     blurb: "One long street where Millet and the Barbizon painters worked. Galleries, inns and a cozy lunch.",
     dec: "Good half-day for the jet-lag first days. The museum keeps winter hours, 10:00–12:30 and 14:00–17:30." },
-  { id: "vaux", ll: [48.5656, 2.7141], budget: 25.9, closedDates: ["2026-12-14", "2026-12-15"], photo: "Le_chateau_de_Vaux_le_Vicomte.jpg", area: "fbl", title: "Le Grand Noël at Vaux-le-Vicomte", travel: "30 min", time: "Half day", price: "€25.90 weekdays, from €27.90 weekends and school break", tags: ["xmas", "indoor"],
+  { id: "vaux", book: "sellout", ll: [48.5656, 2.7141], budget: 25.9, closedDates: ["2026-12-14", "2026-12-15"], photo: "Le_chateau_de_Vaux_le_Vicomte.jpg", area: "fbl", title: "Le Grand Noël at Vaux-le-Vicomte", travel: "30 min", time: "Half day", price: "€25.90 weekdays, from €27.90 weekends and school break", tags: ["xmas", "indoor"],
     blurb: "The château that inspired Versailles. Each winter the whole house is dressed for Christmas, with a light show on the façade and an ice rink.",
     dec: "Runs 14 Nov 2026 to 3 Jan 2027: Wednesday to Sunday until 18 Dec, then daily from 19 Dec (closed 24 and 25 Dec). Timed online booking is mandatory and it sells out, so this one needs an early decision." },
   { id: "moret", ll: [48.3723, 2.8155], budget: 0, photo: "Moret_sur_Loing-Église_Notre_Dame_de_la_Nativité_VP-20130317.jpg", area: "fbl", title: "Moret-sur-Loing", travel: "15 min", time: "2 h", price: "Free", tags: ["outdoor"],
@@ -93,7 +94,7 @@ const ACTIVITIES = [
   { id: "fbl-market", ll: [48.4046, 2.7016], budget: 0, photo: "Place_de_la_République_(Fontainebleau).jpg", area: "fbl", title: "Fontainebleau market & town", travel: "In town", time: "Morning", price: "Free", tags: ["food", "xmas"],
     blurb: "Tuesday, Friday and Sunday morning market. Cheeses, oysters, bakeries. See how Brendon lives.",
     dec: "The town puts up its own Christmas lights and stalls in December." },
-  { id: "disney", ll: [48.8722, 2.7758], budget: 75, photo: "Disneyland_Paryż_2013_(13).JPG", area: "fbl", title: "Disneyland Paris", travel: "50 min", time: "Full day", price: "From about €69–75 for one park before 19 Dec, €96+ after", tags: ["xmas", "outdoor"],
+  { id: "disney", book: "advised", ll: [48.8722, 2.7758], budget: 75, photo: "Disneyland_Paryż_2013_(13).JPG", area: "fbl", title: "Disneyland Paris", travel: "50 min", time: "Full day", price: "From about €69–75 for one park before 19 Dec, €96+ after", tags: ["xmas", "outdoor"],
     blurb: "Two parks with a Christmas parade and decorations in December.",
     dec: "Dated tickets get more expensive from 19 Dec when school break start, so an earlier weekday is best. Two parks add about €35. Buy online in advance." },
 
@@ -104,13 +105,13 @@ const ACTIVITIES = [
   { id: "hoc", ll: [49.3972, -0.989], budget: 0, photo: "01_Pointe_du_Hoc.jpg", area: "normandy", title: "Pointe du Hoc", travel: "3 h 30", time: "1 h", price: "Free", tags: ["ww2", "outdoor"],
     blurb: "Cliffs the US Rangers climbed on D-Day. Bomb craters and bunkers are still there.",
     dec: "Winter hours 9:00–12:30 and 13:30–17:00. Very windy; dress warmly." },
-  { id: "guide", ll: [49.2765, -0.703], budget: 700, perGroup: true, photo: "Omaha_beachhead_6_June_1944.jpg", area: "normandy", title: "Full-day guided D-Day tour", travel: "From Bayeux", time: "Full day", price: "About €700 for a private day for up to 4; shared tours about €135–140 each", tags: ["ww2"],
+  { id: "guide", book: "sellout", ll: [49.2765, -0.703], budget: 700, perGroup: true, photo: "Omaha_beachhead_6_June_1944.jpg", area: "normandy", title: "Full-day guided D-Day tour", travel: "From Bayeux", time: "Full day", price: "About €700 for a private day for up to 4; shared tours about €135–140 each", tags: ["ww2"],
     blurb: "A local historian drives you between sites and tells the stories. Many guides can tailor the day to a family connection.",
     dec: "Strongly recommended in winter when site exhibits are thinner. Museum entries and lunch are extra. Winter departures are fewer, so book early." },
-  { id: "stmere", ll: [49.4087, -1.3168], budget: 11.5, closedBefore: "2026-12-19", photo: "Paratrooper-hanging-from-ste-mere-eglise-church.JPG", area: "normandy", title: "Sainte-Mère-Église & Airborne Museum", travel: "3 h 45", time: "2–3 h", price: "€11.50", tags: ["ww2", "indoor"],
+  { id: "stmere", book: "advised", ll: [49.4087, -1.3168], budget: 11.5, closedBefore: "2026-12-19", photo: "Paratrooper-hanging-from-ste-mere-eglise-church.JPG", area: "normandy", title: "Sainte-Mère-Église & Airborne Museum", travel: "3 h 45", time: "2–3 h", price: "€11.50", tags: ["ww2", "indoor"],
     blurb: "The town paratroopers dropped into on D-Day night, with the famous dummy paratrooper on the church tower.",
     dec: "Careful: the museum closes for most of December and reopens only for the Christmas break (around 20 Dec last year). The town and church can be seen any day." },
-  { id: "utah", ll: [49.415, -1.175], budget: 10, closedBefore: "2026-12-15", photo: "B-26_Marauder_at_the_Musée_d'Utah_Beach_02.JPG", area: "normandy", title: "Utah Beach Museum", travel: "3 h 45", time: "2 h", price: "€10", tags: ["ww2", "indoor"],
+  { id: "utah", book: "advised", ll: [49.415, -1.175], budget: 10, closedBefore: "2026-12-15", photo: "B-26_Marauder_at_the_Musée_d'Utah_Beach_02.JPG", area: "normandy", title: "Utah Beach Museum", travel: "3 h 45", time: "2 h", price: "€10", tags: ["ww2", "indoor"],
     blurb: "Built on the beach itself, with a B-26 bomber inside. Easy to pair with Sainte-Mère-Église.",
     dec: "Closed for its winter break until 14 Dec; reopens 15 Dec, 10:00–18:00. Tickets are sold online only." },
   { id: "arromanches", ll: [49.34, -0.622], budget: 7, closedDates: ["2026-12-14"], photo: "Arromanches-les-Bains_port_artificiel_Mulberry.jpg", area: "normandy", title: "Arromanches & the Mulberry harbor", travel: "3 h 15", time: "2 h", price: "€7 for the 360° cinema; D-Day museum €12.90", tags: ["ww2", "outdoor"],
@@ -122,7 +123,7 @@ const ACTIVITIES = [
   { id: "juno-pegasus", ll: [49.3364, -0.4616], budget: 9, photo: "Pegasus_Bridge_Original01_90.jpg", area: "normandy", title: "Juno Beach Centre & Pegasus Bridge", travel: "3 h", time: "Half day", price: "€9", tags: ["ww2", "indoor"],
     blurb: "The Canadian and British side of D-Day: Canada's museum on Juno Beach, and the bridge taken by glider troops in the first minutes.",
     dec: "Juno Beach Centre is open 10:00–17:00 daily in December (closed Dec 25 and all of January); buy at the door. The Pegasus museum is closed for expansion until June 2027, so the bridge and Café Gondrée can only be seen from outside." },
-  { id: "caen", ll: [49.1978, -0.3836], budget: 20.8, closedDates: ["2026-12-16"], photo: "Mémorial_de_Caen,_bunker_souterrain_du_Général_Richter_-_vue_général.jpg", area: "normandy", title: "Caen Memorial museum", travel: "2 h 45", time: "3 h", price: "€20.80", tags: ["ww2", "indoor"],
+  { id: "caen", book: "advised", ll: [49.1978, -0.3836], budget: 20.8, closedDates: ["2026-12-16"], photo: "Mémorial_de_Caen,_bunker_souterrain_du_Général_Richter_-_vue_général.jpg", area: "normandy", title: "Caen Memorial museum", travel: "2 h 45", time: "3 h", price: "€20.80", tags: ["ww2", "indoor"],
     blurb: "The most complete museum of the war, from the 1930s through D-Day to the Cold War.",
     dec: "Ideal for a cold or rainy Normandy day. Closed Wednesdays 2, 9 and 16 December. Combined ticket with the Arromanches 360° cinema €24." },
   { id: "bayeux", ll: [49.2764, -0.7032], budget: 8.5, photo: "00_3375_Kathedrale_von_Bayeux_(Kathedrale_Notre-Dame_de_Bayeux).jpg", area: "normandy", title: "Bayeux town & war cemetery", travel: "3 h 15", time: "Half day", price: "Free; Battle of Normandy museum €8.50", tags: ["ww2", "xmas", "food"],
@@ -131,7 +132,7 @@ const ACTIVITIES = [
   { id: "lacambe", ll: [49.3433, -1.0254], budget: 0, photo: "Overview_german_military_cemetery_La_Cambe_Calvados_WWII.jpg", area: "normandy", title: "La Cambe German cemetery", travel: "3 h 30", time: "45 min", price: "Free", tags: ["ww2", "outdoor"],
     blurb: "A sober contrast to the American cemetery: 21,000 German soldiers under dark crosses.",
     dec: "On the way between Omaha and Utah." },
-  { id: "mont", ll: [48.6361, -1.5115], budget: 13, photo: "Mont_Saint-Michel_France.jpg", area: "normandy", title: "Mont-Saint-Michel", travel: "1 h 30 from Bayeux", time: "Half day", price: "€13 abbey (winter rate); parking €14 a day, €12 booked online", tags: ["outdoor", "overnight"],
+  { id: "mont", book: "advised", ll: [48.6361, -1.5115], budget: 13, photo: "Mont_Saint-Michel_France.jpg", area: "normandy", title: "Mont-Saint-Michel", travel: "1 h 30 from Bayeux", time: "Half day", price: "€13 abbey (winter rate); parking €14 a day, €12 booked online", tags: ["outdoor", "overnight"],
     blurb: "The abbey on a tidal island. One of the great sights of France.",
     dec: "Far quieter in December. Abbey open 9:30–18:00, last entry 17:00, free on Sunday 6 Dec. Could be a third day of the Normandy trip." },
   { id: "honfleur", ll: [49.4194, 0.233], budget: 0, photo: "Vieux_bassin_Honfleur.JPG", area: "normandy", title: "Honfleur & Étretat coast", travel: "2 h 15", time: "Day", price: "Free", tags: ["outdoor", "food", "xmas"],
@@ -142,13 +143,13 @@ const ACTIVITIES = [
     dec: "Good Christmas market by the cathedral. Easy stop on the way to Normandy." },
 
   // ---------- BEYOND ----------
-  { id: "strasbourg", ll: [48.5839, 7.7455], budget: 90, photo: "Strasbourg_Christkindelsmärik_30_nov_2014.jpg", area: "beyond", title: "Strasbourg Christmas market", travel: "1 h 50 TGV from Paris", time: "1–2 days", price: "Market free; TGV roughly €30–60 each way booked ahead", tags: ["xmas", "food", "overnight"],
+  { id: "strasbourg", book: "sellout", ll: [48.5839, 7.7455], budget: 90, photo: "Strasbourg_Christkindelsmärik_30_nov_2014.jpg", area: "beyond", title: "Strasbourg Christmas market", travel: "1 h 50 TGV from Paris", time: "1–2 days", price: "Market free; TGV roughly €30–60 each way booked ahead", tags: ["xmas", "food", "overnight"],
     blurb: "France's oldest and most famous Christmas market, running since 1570, in a half-timbered old town.",
     dec: "Market runs 27 Nov to 24 Dec 2026. Can add nearby Colmar, which looks like a Christmas card. Hotels book up early, so decide soon." },
   { id: "reims", ll: [49.2537, 4.034], budget: 5.5, photo: "Facade_of_Reims_Cathedral.jpg", area: "beyond", title: "Reims: cathedral & Surrender Museum", travel: "2 h by car", time: "Full day", price: "Cathedral free; Surrender Museum €5.50", closedDays: "Museum closed Tue", tags: ["ww2", "xmas", "indoor"],
     blurb: "The cathedral where French kings were crowned, and the schoolroom where Germany signed its surrender on 7 May 1945, kept exactly as it was.",
     dec: "Reims has a sizable Christmas market around the cathedral. The museum is free on Sunday 6 Dec. The Palais du Tau next to the cathedral is closed for renovation until 2027." },
-  { id: "loire", ll: [47.6161, 1.517], budget: 50, photo: "Château_de_Chenonceau_-_west_facade_over_Cher_(4_May_2006).JPG", area: "beyond", title: "Loire Valley châteaux", travel: "2 h by car", time: "Full day or overnight", price: "Chambord €31 (the non-EU rate), Chenonceau €19", tags: ["xmas", "indoor", "overnight"],
+  { id: "loire", book: "advised", ll: [47.6161, 1.517], budget: 50, photo: "Château_de_Chenonceau_-_west_facade_over_Cher_(4_May_2006).JPG", area: "beyond", title: "Loire Valley châteaux", travel: "2 h by car", time: "Full day or overnight", price: "Chambord €31 (the non-EU rate), Chenonceau €19", tags: ["xmas", "indoor", "overnight"],
     blurb: "Chambord's huge Renaissance château and Chenonceau built across a river.",
     dec: "Both are decorated for Christmas from 28 Nov to 3 Jan, included in the ticket. Daylight is short, so two châteaux in a day is the limit." },
   { id: "chartres", ll: [48.4477, 1.4876], budget: 0, photo: "Chartres_cathedral_(West_façade).jpg", area: "beyond", title: "Chartres Cathedral", travel: "1 h 30 by car", time: "Half day", price: "Free", tags: ["indoor", "xmas"],
@@ -157,7 +158,7 @@ const ACTIVITIES = [
   { id: "lille", ll: [50.6366, 3.0635], budget: 67, photo: "Grand_place,_Lille.jpg", area: "beyond", title: "Lille", travel: "1 h TGV from Paris", time: "Full day", price: "Market free; art museum €7; TGV roughly €30–65 each way", tags: ["xmas", "food"],
     blurb: "Flemish-style grand squares, waffles and a big Christmas market with a Ferris wheel.",
     dec: "Market runs 18 Nov to 30 Dec. Easy day trip by train." },
-  { id: "verdun", ll: [49.208, 5.423], budget: 21, photo: "Ossuary_of_Douaumont_(Verdun,_France_2013)_(9124638286).jpg", area: "beyond", title: "Verdun WWI battlefield", travel: "3 h by car", time: "Full day", price: "Memorial €14, or €19 with Fort Douaumont; Ossuary €7", tags: ["outdoor", "indoor"],
+  { id: "verdun", book: "advised", ll: [49.208, 5.423], budget: 21, photo: "Ossuary_of_Douaumont_(Verdun,_France_2013)_(9124638286).jpg", area: "beyond", title: "Verdun WWI battlefield", travel: "3 h by car", time: "Full day", price: "Memorial €14, or €19 with Fort Douaumont; Ossuary €7", tags: ["outdoor", "indoor"],
     blurb: "For the history buffs: forts, trenches and the Douaumont ossuary from the 1916 battle.",
     dec: "All open daily 9:30–17:30 in December (closed 24 and 25 Dec). Long day. Better as an overnight combined with Reims." },
   { id: "giverny", ll: [49.0754, 1.5338], budget: 0, photo: "Giverny.marre_aux_nénuphars_et_un_des_deux_ponts_japonais.jpg", area: "beyond", title: "Giverny (Monet's garden)", travel: "1 h 45", time: "—", price: "—", closed: true, tags: ["outdoor"],
@@ -257,6 +258,42 @@ const ACTIVITIES = [
     where: "Street vendors near the big sights and Christmas markets." },
 ];
 /* ===== END OF ACTIVITY LIST ===== */
+
+/* ===== Rental car for the Normandy days: shown on the Plan tab. Prices are Kayak quotes in US dollars for 15–18 Dec 2026, checked 26 Oct 2026. ===== */
+const CAR = {
+  title: "Rental car for Normandy",
+  intro: "Five adults plus a baby in a car seat means a 7-seat minivan, and it has to be automatic. Automatics are rare in small French agencies, so this is the first thing to book once the Normandy dates are fixed. Everything in Fontainebleau closes Sunday.",
+  estimatePerDay: 90,   // euros per day, 7-seat automatic plus infant seat, used by the Budget panel
+  fuelTolls: 150,       // euros, rough fuel plus A13 tolls for the Normandy loop (about 700 km)
+  options: [
+    { name: "Enterprise Fontainebleau", where: "116 rue Grande, Fontainebleau · +33 1 64 39 03 09 · Mon–Fri 9–12 & 14–18, Sat 9–12 & 14–17, Sun closed", url: "https://www.enterprise.fr/",
+      vehicle: "Yes: Peugeot 5008 automatic (7 seats). Also a 9-seat Renault Trafic automatic.", price: "$250 (5008) · $488 (Trafic)",
+      notes: "The only 7-seat automatic offered in town for these dates. Infant seat €15/day. Enterprise asks for a licence held 7+ years for the minivan categories; deposit €300 (€500 for the Trafic). Unlimited km." },
+    { name: "Avis Fontainebleau", where: "185 rue Grande, Fontainebleau · +33 1 64 22 49 65 · Mon–Fri 8–12 & 14–18, Sat 8:30–12, Sun closed", url: "https://www.avis.fr/",
+      vehicle: "Partly: Nissan X-Trail automatic (7-seat SUV, tight third row). Avis Melun has a 5008 automatic.", price: "$304–402 (X-Trail) · $419 (5008, Melun)",
+      notes: "Infant seat €14.98/day. 7-seat and minibus categories need 6+ years of licence and two credit cards. Also runs a small counter at Fontainebleau-Avon station, weekdays 10–11:30 and 14:30–16:30 only." },
+    { name: "Europcar Dammarie-lès-Lys (Melun)", where: "560 av. Jean-Jaurès, Dammarie-lès-Lys · +33 1 64 39 75 75 · 20 min from Fontainebleau", url: "https://www.europcar.fr/",
+      vehicle: "Yes: 7-seat passenger van, automatic.", price: "$384",
+      notes: "Infant seat €14/day, capped at 5 days. The Europcar listing in Avon showed no hours or cars and may be dormant." },
+    { name: "Paris: Gare de Lyon or CDG", where: "Gare de Lyon is 40 min by train from Fontainebleau-Avon; CDG is 1 h 15 by car", url: "https://www.autoeurope.com/",
+      vehicle: "Yes, much more choice: Renault Grand Scénic / Ford Grand C-MAX automatic, Hertz 7-seat van automatic, 9-seaters.", price: "$204 (Auto Europe) · $229 (Hertz)",
+      notes: "Cheaper and deeper availability, but you drive through Paris and the car must go back to Paris unless a one-way return to Fontainebleau is quoted. Station pickups add about €45." },
+    { name: "Turo (peer-to-peer)", where: "Private cars around Fontainebleau, address after booking", url: "https://turo.com/",
+      vehicle: "A Citroën Grand C4 Picasso automatic (7 seats) was listed.", price: "$156",
+      notes: "Cheapest, but usually no infant seat, owner-set mileage caps, and no backup if the car isn't there. Risky with a baby." },
+  ],
+  tips: [
+    "Luggage: with 5 adults, the baby seat and bags, a 5008 has almost no trunk space with all seats up. The 9-seat Trafic automatic at Enterprise is the comfortable choice; otherwise pack light.",
+    "Pick the driver with the oldest licence: Enterprise wants 7 years for the minivan, Avis 6. Everyone driving must be 21+, and under-25s pay €33–55 a day extra.",
+    "Bring the physical US licence and passport. An International Driving Permit (AAA, $20) isn't legally required for a US licence but some agencies and the road code wording make it cheap insurance. Digital licences are refused.",
+    "Bringing your own infant seat from the US is allowed and airlines carry it free; it saves €45 and the agencies stock very few.",
+    "Tolls on the A13 are barrier-free: about €25–30 each way to Bayeux. Ask whether the car has a toll badge; otherwise pay online at sanef.com within 72 hours.",
+    "No winter-tire rule applies on this route. Rental cars carry the Crit'Air sticker, so Rouen and Caen's low-emission zones are not a problem.",
+    "Book early November with free cancellation: December is the most expensive month locally and automatics go first.",
+  ],
+  checked: "Prices are Kayak totals in US dollars for a Tuesday-to-Friday rental, 15–18 December 2026, checked on 26 October 2026, before the car seat. Fees come from each company's French tariff sheet. Nothing has been booked.",
+};
+
 
 /* ===== Paris Museum Pass: used by the Budget panel to say whether a pass pays off. Prices checked Oct 2026. ===== */
 const PASS = {

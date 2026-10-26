@@ -42,7 +42,10 @@ function closedWarning(a, iso) {
 const ONLINE = !!(CONFIG.SCRIPT_URL || "").trim();
 const PLAN_KEY = "_plan";                 // reserved row in the Sheet that holds the draft plan
 const blank = () => ({ r: {}, note: {}, top: [], ideas: [] });
-const blankPlan = () => ({ days: {}, note: {} });
+const blankPlan = () => ({ days: {}, note: {}, booking: {} });
+let sortMode = load("fg-sort", "default");
+const BOOK_LABEL = { sellout: "Sells out: book the moment the day is fixed", advised: "Timed slot or online-only ticket" };
+const STATUS = ["Not booked", "Booked", "Confirmed"];
 let me = load("fg-me", "");            // the family name this browser votes as
 let mine = blank();
 let all = {};                          // name -> vote data
@@ -131,7 +134,12 @@ function renderFilters() {
   for (const a of AREAS) f.append(mk(a.name, filterArea === a.id, () => { filterArea = a.id; render() }));
   f.append(el("span", { class: "sep" }));
   for (const [k, label] of Object.entries(TAGS)) f.append(mk(label, filterTag === k, () => { filterTag = filterTag === k ? null : k; render() }));
+  f.append(mk("Free", filterTag === "free", () => { filterTag = filterTag === "free" ? null : "free"; render() }));
   f.append(mk("Not rated by me", filterTag === "unrated", () => { filterTag = filterTag === "unrated" ? null : "unrated"; render() }));
+  const sort = el("select", { class: "sortsel", "aria-label": "Sort cards" });
+  [["default", "Sort: as listed"], ["price-asc", "Sort: cheapest first"], ["price-desc", "Sort: priciest first"], ["score", "Sort: family score"], ["mine", "Sort: my rating"]].forEach(([v, t]) => sort.append(el("option", { value: v, text: t })));
+  sort.value = sortMode; sort.addEventListener("change", () => { sortMode = sort.value; store("fg-sort", sortMode); render() });
+  f.append(sort);
   if (me) {
     const n = ratedCount(mine), total = VOTABLE.length;
     const p = el("div", { class: "progress" }, el("span", { text: `You've rated ${n} of ${total}` }), el("span", { class: "pbar" }, el("span", { style: `width:${100 * n / total}%` })));
@@ -179,7 +187,7 @@ function card(a) {
     el("h3", { text: a.title }), meta, el("p", { class: "blurb", text: a.blurb }),
     food ? el("p", { class: "dec" }, el("b", { text: "Where: " }), a.where) : el("p", { class: "dec" }, el("b", { text: "In December: " }), a.dec), tags);
   const on = plannedOn(a.id);
-  if (on.length) c.append(el("div", { class: "planned", text: "In the plan: " + on.map(fmtDay).join(", ") }));
+  if (on.length) c.append(el("div", { class: "planned", text: "In the plan: " + on.map(fmtDay).join(", ") + bookBadge(a.id) }));
   if (!a.closed) {
     const rate = el("div", { class: "rate", role: "group", "aria-label": food ? "Do you want to try this?" : "How much do you want this?" });
     for (const r of ratingsFor(a)) rate.append(el("button", { "data-v": String(r.v), "aria-pressed": String(myV === r.v), disabled: !canWrite(),
@@ -192,7 +200,8 @@ function card(a) {
         text: starred ? "★ In my top 5 (#" + (mine.top.indexOf(a.id) + 1) + ")" : "☆ Add to my top 5" }),
       canWrite() ? el("button", { class: "linkish", onclick: () => { openNotes.has(a.id) ? openNotes.delete(a.id) : openNotes.add(a.id); render() },
         text: openNotes.has(a.id) ? "Hide note" : hasNote ? "Edit my note" : "Add a note" }) : null,
-      food ? null : el("a", { class: "linkish", href: "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(a.title + " France"), target: "_blank", rel: "noopener", text: "Map" })));
+      food ? null : el("a", { class: "linkish", href: "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(a.title + " France"), target: "_blank", rel: "noopener", text: "Map" }),
+      el("button", { class: "linkish", title: "Copy a link to this card", onclick: () => copyLink(a.id), text: "Link" })));
     if (openNotes.has(a.id) && canWrite()) {
       const ta = el("textarea", { id: "note-" + a.id, placeholder: "Thoughts, questions, must-sees…", maxlength: "1000" });
       ta.value = mine.note[a.id] || "";
@@ -220,7 +229,13 @@ function renderBrowse() {
     if (filterArea !== "all" && filterArea !== area.id) continue;
     let items = ACTIVITIES.filter(a => a.area === area.id);
     if (filterTag === "unrated") items = items.filter(a => !a.closed && mine.r[a.id] == null);
+    else if (filterTag === "free") items = items.filter(a => !a.closed && !a.budget);
     else if (filterTag) items = items.filter(a => a.tags.includes(filterTag));
+    if (sortMode !== "default") {
+      const sc = sortMode === "score" ? Object.fromEntries(scoreRows(allVotes()).map(r => [r.a.id, r.score])) : null;
+      items = items.slice().sort((x, y) => sortMode === "price-asc" ? (x.budget || 0) - (y.budget || 0) : sortMode === "price-desc" ? (y.budget || 0) - (x.budget || 0)
+        : sortMode === "score" ? (sc[y.id] || 0) - (sc[x.id] || 0) : (mine.r[y.id] || 0) - (mine.r[x.id] || 0));
+    }
     if (!items.length) continue;
     const grid = el("div", { class: "grid" }); items.forEach(a => grid.append(card(a)));
     root.append(el("section", { class: "area", id: "area-" + area.id },
@@ -326,7 +341,7 @@ function renderResults() {
 }
 
 // ---- budget ----
-const TRAVELERS = CONFIG.FAMILY.length;
+const TRAVELERS = CONFIG.ADULTS || CONFIG.FAMILY.length;
 function costOf(ids) {
   let perPerson = 0, group = 0, passable = 0;
   for (const id of ids) { const a = byId[id]; if (!a || !a.budget) continue; if (a.perGroup) group += a.budget; else { perPerson += a.budget; if (typeof PASS !== "undefined" && PASS.covers.includes(id)) passable += a.budget } }
@@ -347,6 +362,8 @@ function renderBudget(votes, rows) {
     }
     return box;
   };
+  const normandyDays = DAYS.filter(d => (plan.days[d] || []).some(id => byId[id] && byId[id].area === "normandy")).length;
+  if (typeof CAR !== "undefined" && normandyDays) b.append(el("div", { class: "person budgetbox" }, el("h3", { text: "Rental car" }), el("div", { class: "bigmoney", text: euro(CAR.estimatePerDay * Math.max(3, normandyDays)) }), el("p", { class: "small", style: "margin:2px 0 0", text: `About ${euro(CAR.estimatePerDay)} a day for a 7-seat automatic with a car seat, times ${Math.max(3, normandyDays)} days (minimum 3), shared. Fuel and tolls extra, roughly ${euro(CAR.fuelTolls)} for the Normandy loop.` })));
   b.append(line("The draft plan", planned, "Everything currently on the Plan tab, per-person prices times " + TRAVELERS + "."),
     line("Every Must do", musts, "Everything at least one person rated Must do or Must try."));
   if (typeof PASS !== "undefined") {
@@ -377,7 +394,7 @@ function renderPlan() {
       const a = byId[id]; if (!a) return;
       const warn = closedWarning(a, d);
       const li = el("li", { class: warn ? "warn" : "" }, el("span", { class: "t" }, el("b", { text: a.title }), warn ? el("span", { class: "warnmsg", text: " ⚠ " + warn }) : null,
-        el("span", { class: "small", text: " " + (a.area === "food" ? a.price : a.travel + " · " + a.time) })));
+        el("span", { class: "small", text: " " + (a.area === "food" ? a.price : a.travel + " · " + a.time) }), a.book ? el("span", { class: "small bookmark" + ((plan.booking[id] || {}).status ? " done" : ""), text: bookBadge(id) }) : null));
       if (editable) li.append(el("span", { class: "btns" },
         el("button", { class: "mini", "aria-label": "Move up", disabled: i === 0, onclick: () => { [ids[i - 1], ids[i]] = [ids[i], ids[i - 1]]; queuePlanSave(); render() }, text: "↑" }),
         el("button", { class: "mini", "aria-label": "Move down", disabled: i === ids.length - 1, onclick: () => { [ids[i + 1], ids[i]] = [ids[i], ids[i + 1]]; queuePlanSave(); render() }, text: "↓" }),
@@ -403,14 +420,58 @@ function renderPlan() {
     grid.append(col);
   }
   root.append(grid);
+  renderBookings(editable);
+  renderCar(editable);
 
-  // unscheduled favourites
+  // unscheduled favorites
   const un = rows.filter(r => r.score > 0 && !planned.has(r.a.id)).sort((x, y) => y.score - x.score).slice(0, 15);
   const box = el("div", { class: "panel", style: "margin-top:24px" }, el("h2", { text: "Popular but not planned yet" }),
     el("p", { class: "small", text: "Highest-scoring things that aren't on a day yet." }));
   if (!un.length) box.append(el("p", { class: "empty", text: "Everything with votes is on the plan, or no one has voted yet." }));
   else { const ul = el("ul", { class: "plain" }); un.forEach(r => ul.append(el("li", {}, el("b", { text: r.a.title }), ` — ${r.score} pts · ${areaName(r.a.area)}`))); box.append(ul) }
   root.append(box);
+}
+
+// ---- bookings ----
+function renderBookings(editable) {
+  const root = $("#bookings"); root.replaceChildren();
+  const planned = [...new Set(DAYS.flatMap(d => plan.days[d] || []))].filter(id => byId[id] && byId[id].book);
+  const order = { sellout: 0, advised: 1 };
+  planned.sort((x, y) => (order[byId[x].book] - order[byId[y].book]) || plannedOn(x)[0].localeCompare(plannedOn(y)[0]));
+  const open = planned.filter(id => !(plan.booking[id] || {}).status).length;
+  root.append(el("div", { class: "area-head" }, el("h2", { text: "Bookings" }), el("p", { text: planned.length ? `${open} of ${planned.length} planned items still need booking. Everything not listed here is walk-up.` : "Once something that needs a ticket is on a day, it shows up here with a status." })));
+  if (!planned.length) return;
+  const tb = el("tbody");
+  for (const id of planned) {
+    const a = byId[id]; const b = plan.booking[id] || {}; const st = b.status || 0;
+    const tr = el("tr", { class: st ? "booked" : "" });
+    tr.append(el("td", {}, el("b", { text: a.title }), el("div", { class: "small", text: plannedOn(id).map(fmtDay).join(", ") + " · " + (a.price || "") })));
+    tr.append(el("td", { class: "small" }, el("span", { class: "tag " + (a.book === "sellout" ? "xmas" : ""), text: a.book === "sellout" ? "Sells out" : "Book ahead" }), el("div", { text: BOOK_LABEL[a.book] })));
+    if (editable) {
+      const sel = el("select", { "aria-label": "Booking status for " + a.title });
+      STATUS.forEach((t, i) => sel.append(el("option", { value: String(i), text: t })));
+      sel.value = String(st);
+      sel.addEventListener("change", () => { plan.booking[id] = { ...b, status: +sel.value }; queuePlanSave(); render() });
+      const ref = el("input", { type: "text", class: "ref", placeholder: "Confirmation #, time slot…", maxlength: "120", value: b.ref || "" });
+      ref.addEventListener("input", () => { plan.booking[id] = { ...(plan.booking[id] || {}), status: st, ref: ref.value }; queuePlanSave() });
+      tr.append(el("td", {}, sel), el("td", {}, ref));
+    } else tr.append(el("td", { text: STATUS[st] }), el("td", { class: "small", text: b.ref || "" }));
+    tb.append(tr);
+  }
+  root.append(el("div", { class: "tablewrap", style: "margin-top:12px" }, el("table", { class: "booktable" }, el("thead", {}, el("tr", {}, el("th", { text: "What" }), el("th", { text: "Why" }), el("th", { text: "Status" }), el("th", { text: "Reference" }))), tb)));
+}
+
+// ---- rental car ----
+function renderCar(editable) {
+  const root = $("#car"); root.replaceChildren();
+  if (typeof CAR === "undefined") return;
+  root.append(el("div", { class: "area-head", style: "margin-top:28px" }, el("h2", { text: CAR.title }), el("p", { text: CAR.intro })));
+  const tb = el("tbody");
+  for (const o of CAR.options) tb.append(el("tr", {}, el("td", {}, el("a", { href: o.url, target: "_blank", rel: "noopener" }, el("b", { text: o.name })), el("div", { class: "small", text: o.where })),
+    el("td", { class: "small", text: o.vehicle }), el("td", { class: "num", text: o.price }), el("td", { class: "small", text: o.notes })));
+  root.append(el("div", { class: "tablewrap", style: "margin-top:12px" }, el("table", {}, el("thead", {}, el("tr", {}, el("th", { text: "Agency" }), el("th", { text: "7-seat automatic" }), el("th", { text: "3 days, approx.", style: "text-align:right" }), el("th", { text: "Notes" }))), tb)));
+  const ul = el("ul", { class: "plain", style: "margin-top:10px" }); CAR.tips.forEach(t => ul.append(el("li", { text: t }))); root.append(ul);
+  root.append(el("p", { class: "small", text: CAR.checked }));
 }
 
 // ---- map ----
@@ -437,11 +498,26 @@ function renderMap() {
   }
   setTimeout(() => map.invalidateSize(), 50);
 }
-document.addEventListener("click", e => {
-  const j = e.target.closest("[data-jump]"); if (!j) return;
-  e.preventDefault(); filterArea = "all"; filterTag = null; setView("browse");
-  const c = document.getElementById("card-" + j.dataset.jump); if (c) { c.scrollIntoView({ block: "center" }); c.classList.add("flash"); setTimeout(() => c.classList.remove("flash"), 1600) }
-});
+function jumpTo(id) {
+  if (!byId[id]) return;
+  filterArea = "all"; filterTag = null; setView("browse");
+  const c = document.getElementById("card-" + id); if (c) { c.scrollIntoView({ block: "center" }); c.classList.add("flash"); setTimeout(() => c.classList.remove("flash"), 1600) }
+}
+document.addEventListener("click", e => { const j = e.target.closest("[data-jump]"); if (!j) return; e.preventDefault(); jumpTo(j.dataset.jump) });
+async function copyLink(id) {
+  const url = location.origin + location.pathname + "#card-" + id;
+  try { await navigator.clipboard.writeText(url); flash("Link copied: " + url) } catch { prompt("Copy this link", url) }
+}
+function bookBadge(id) {
+  const a = byId[id]; if (!a || !a.book) return "";
+  const st = (plan.booking[id] || {}).status || 0;
+  return st ? " · ✓ " + STATUS[st] : " · ⚑ Needs booking";
+}
+function countdown() {
+  const t = new Date(); t.setHours(0, 0, 0, 0);
+  const d = Math.round((dayDate(DAYS[0]) - t) / 864e5), e = Math.round((dayDate(DAYS[DAYS.length - 1]) - t) / 864e5);
+  return d > 1 ? d + " days to go" : d === 1 ? "Tomorrow!" : d === 0 ? "Arrival day" : e >= 0 ? "Day " + (1 - d) + " of " + DAYS.length : "Thanks for coming";
+}
 
 // ---- phrases ----
 function renderPhrases() {
@@ -493,12 +569,15 @@ $("#ideaform").addEventListener("submit", e => {
 // ---- boot ----
 (async () => {
   if (!ONLINE) { baseNotice = "Preview mode: votes save only in this browser until the Google Sheet is connected in config.js."; $("#notice").textContent = baseNotice; $("#notice").hidden = false }
+  $("#countdown").textContent = " · " + countdown();
   setView(load("fg-view", "browse"));
   setStatus("Loading votes…");
   const ok = await fetchAll();
   if (me && all[me]) mine = clone({ ...blank(), ...all[me] });
   setStatus(!ok ? "Couldn't load votes. Reload to try again." : me ? "Voting as " + me : "Pick your name to vote", ok && !!me);
   render();
+  if (location.hash.startsWith("#card-")) setTimeout(() => jumpTo(location.hash.slice(6)), 100);
+  window.addEventListener("hashchange", () => { if (location.hash.startsWith("#card-")) jumpTo(location.hash.slice(6)) });
   // pick up everyone else's votes and plan edits every 30 seconds (skip while typing)
   if (ONLINE) setInterval(async () => {
     if (dirty || planDirty || document.hidden) return;
