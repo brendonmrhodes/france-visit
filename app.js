@@ -341,7 +341,8 @@ function renderResults() {
 }
 
 // ---- budget ----
-const TRAVELERS = CONFIG.ADULTS || CONFIG.FAMILY.length;
+const ADULT_OPTIONS = CONFIG.ADULT_OPTIONS || [{ n: CONFIG.ADULTS || CONFIG.FAMILY.length, label: "everyone" }];
+let TRAVELERS = load("fg-adults", ADULT_OPTIONS[ADULT_OPTIONS.length - 1].n);
 function costOf(ids) {
   let perPerson = 0, group = 0, passable = 0;
   for (const id of ids) { const a = byId[id]; if (!a || !a.budget) continue; if (a.perGroup) group += a.budget; else { perPerson += a.budget; if (typeof PASS !== "undefined" && PASS.covers.includes(id)) passable += a.budget } }
@@ -349,6 +350,11 @@ function costOf(ids) {
 }
 function renderBudget(votes, rows) {
   const b = $("#budget"); b.replaceChildren();
+  if (ADULT_OPTIONS.length > 1) {
+    const sw = el("div", { class: "filters", style: "margin:0 0 10px" });
+    for (const o of ADULT_OPTIONS) sw.append(el("button", { class: "chipbtn", "aria-pressed": String(TRAVELERS === o.n), onclick: () => { TRAVELERS = o.n; store("fg-adults", o.n); render() }, text: `${o.n} adults: ${o.label}` }));
+    b.append(sw, el("p", { class: "small", style: "margin:0 0 10px", text: "Switch to see what it costs if only the visitors go, or if everyone does. This choice is just for your screen." }));
+  }
   const planned = [...new Set(DAYS.flatMap(d => plan.days[d] || []))];
   const musts = rows.filter(r => r.c[3] >= 1).map(r => r.a.id);
   const line = (title, ids, sub) => {
