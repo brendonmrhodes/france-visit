@@ -1,6 +1,8 @@
 /* App logic. You shouldn't need to edit this file: activities live in activities.js, settings in config.js. */
 const RATINGS = [ { v: 3, label: "Must do" }, { v: 2, label: "Would like" }, { v: 1, label: "Maybe" }, { v: -1, label: "Skip" } ];
-const RLABEL = Object.fromEntries(RATINGS.map(r => [r.v, r.label]));
+const RATINGS_FOOD = [ { v: 3, label: "Must try" }, { v: 2, label: "Would try" }, { v: 1, label: "Maybe" }, { v: -1, label: "Pass" } ];
+const ratingsFor = a => a.area === "food" ? RATINGS_FOOD : RATINGS;
+const labelFor = (a, v) => (ratingsFor(a).find(r => r.v === v) || {}).label || "";
 const byId = Object.fromEntries(ACTIVITIES.map(a => [a.id, a]));
 const $ = s => document.querySelector(s);
 const el = (tag, attrs = {}, ...kids) => {
@@ -98,7 +100,7 @@ function othersLine(a) {
     if (name === me) continue;
     const v = d.r && d.r[a.id]; const starred = (d.top || []).includes(a.id);
     if (v == null && !starred) continue;
-    wrap.append(el("span", { class: "p" }, name + ": ", el("i", { text: (v != null ? RLABEL[v] : "") + (starred ? " ★" : "") })));
+    wrap.append(el("span", { class: "p" }, name + ": ", el("i", { text: (v != null ? labelFor(a, v) : "") + (starred ? " ★" : "") })));
   }
   return wrap.childNodes.length ? wrap : null;
 }
@@ -117,15 +119,19 @@ function card(a) {
   const tags = el("div", { class: "tags" });
   if (a.closed) tags.append(el("span", { class: "tag closedtag", text: "Not open in December" }));
   for (const t of a.tags) tags.append(el("span", { class: "tag" + (t === "ww2" ? " ww2" : t === "xmas" ? " xmas" : ""), text: TAGS[t] || t }));
-  const meta = el("div", { class: "meta" },
-    el("span", { text: "From Fontainebleau: " + a.travel }), el("span", { text: "Time: " + a.time }), el("span", { text: a.cost }),
-    a.closedDays ? el("span", { text: a.closedDays }) : null);
+  const food = a.area === "food";
+  const meta = food
+    ? el("div", { class: "meta" }, el("span", { text: a.origin }), el("span", { class: "price", text: a.price }))
+    : el("div", { class: "meta" },
+      el("span", { text: "From Fontainebleau: " + a.travel }), el("span", { text: "Time: " + a.time }),
+      a.closedDays ? el("span", { text: a.closedDays }) : null,
+      el("span", { class: "price", text: a.price || a.cost }));
   const c = el("article", { class: "card" + (a.closed ? " closed" : "") }, photo(a),
     el("h3", { text: a.title }), meta, el("p", { class: "blurb", text: a.blurb }),
-    el("p", { class: "dec" }, el("b", { text: "In December: " }), a.dec), tags);
+    food ? el("p", { class: "dec" }, el("b", { text: "Where: " }), a.where) : el("p", { class: "dec" }, el("b", { text: "In December: " }), a.dec), tags);
   if (!a.closed) {
-    const rate = el("div", { class: "rate", role: "group", "aria-label": "How much do you want this?" });
-    for (const r of RATINGS) rate.append(el("button", { "data-v": String(r.v), "aria-pressed": String(myV === r.v), disabled: !canWrite(),
+    const rate = el("div", { class: "rate", role: "group", "aria-label": food ? "Do you want to try this?" : "How much do you want this?" });
+    for (const r of ratingsFor(a)) rate.append(el("button", { "data-v": String(r.v), "aria-pressed": String(myV === r.v), disabled: !canWrite(),
       title: canWrite() ? null : "Pick your name at the top first",
       onclick: () => { if (mine.r[a.id] === r.v) delete mine.r[a.id]; else mine.r[a.id] = r.v; queueSave(); render() }, text: r.label }));
     c.append(rate);
@@ -135,7 +141,7 @@ function card(a) {
         text: starred ? "★ In my top 5 (#" + (mine.top.indexOf(a.id) + 1) + ")" : "☆ Add to my top 5" }),
       canWrite() ? el("button", { class: "linkish", onclick: () => { openNotes.has(a.id) ? openNotes.delete(a.id) : openNotes.add(a.id); render() },
         text: openNotes.has(a.id) ? "Hide note" : hasNote ? "Edit my note" : "Add a note" }) : null,
-      el("a", { class: "linkish", href: "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(a.title + " France"), target: "_blank", rel: "noopener", text: "Map" })));
+      food ? null : el("a", { class: "linkish", href: "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(a.title + " France"), target: "_blank", rel: "noopener", text: "Map" })));
     if (openNotes.has(a.id) && canWrite()) {
       const ta = el("textarea", { id: "note-" + a.id, placeholder: "Thoughts, questions, must-sees…", maxlength: "1000" });
       ta.value = mine.note[a.id] || "";
