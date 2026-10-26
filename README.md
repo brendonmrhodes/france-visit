@@ -2,12 +2,14 @@
 
 A small website listing everything the family could do during the 10–22 December 2026 visit. Everyone picks their name, rates each activity, stars a top 5 and leaves notes. Votes are saved to a Google Sheet that you own.
 
+Tabs: **Browse & vote** (the cards), **Family picks** (ranking, who's voted, where people agree, budget and Museum Pass math), **Plan** (a day-by-day draft anyone can edit; it warns when a place is closed that day), **Map** (every pin colored by area) and **French** (useful phrases).
+
 ## What's in this folder
 
 | File | What it is | Edit it? |
 |---|---|---|
 | `index.html` | The page | Rarely |
-| `activities.js` | The list of activities, photos and December notes | Yes, this is where you add or change things |
+| `activities.js` | The list of activities, photos, prices, map pins, the food list, the phrase list and the Museum Pass data | Yes, this is where you add or change things |
 | `config.js` | Family names and the Google Sheet link | Yes, once during setup |
 | `style.css`, `app.js` | Look and behavior | No |
 | `google-sheet/Code.gs` | The script that saves votes into your Sheet | Paste it once during setup |
@@ -42,4 +44,6 @@ Open `config.js` and paste the URL between the quotes on the `SCRIPT_URL` line. 
 ## Good to know
 - Anyone with the link can vote under any name on the list. That's fine for family, but don't post the link publicly.
 - The **Summary** tab in the Sheet shows every vote in plain rows, so you can sort and filter there too.
+- The draft plan is stored in the Sheet as a row named `_plan`. Don't rename it. Anyone who has picked a name can edit the plan; the last save wins if two people edit at the same moment.
+- Prices on the cards are full adult rates checked on official sites in October 2026. The `budget` number on each card feeds the Budget panel; `ll` is the map pin.
 - Photos come from Wikimedia Commons and are freely licensed. Each photo's "Photo: Wikimedia Commons" credit links to its page with the photographer and license.

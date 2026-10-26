@@ -154,3 +154,57 @@ footer { padding-block: 44px; color: var(--muted); font-size: 13px; border-top: 
 footer .fleur { color: var(--gold) }
 .empty { color: var(--muted); font-size: 14px; padding: 12px; border: 1px dashed var(--line); border-radius: var(--r) }
 @media (prefers-reduced-motion: no-preference) { .card { transition: border-color .15s, transform .15s } .card:hover { border-color: var(--gold) } }
+
+/* Progress */
+.progress { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); margin: 10px 0 0 }
+.pbar { flex: 1; max-width: 220px; height: 6px; border-radius: 3px; background: var(--chip); overflow: hidden; display: inline-block; vertical-align: middle }
+.pbar span { display: block; height: 100%; background: var(--green) }
+.prow { display: grid; grid-template-columns: 90px 1fr; gap: 2px 10px; align-items: center; padding: 6px 0; border-bottom: 1px dashed var(--line) }
+.prow:last-of-type { border-bottom: 0 }
+.prow b { font-family: var(--font-display); font-weight: 400; font-size: 16px }
+.prow .small { grid-column: 2 }
+ul.plain { list-style: none; margin: 0; padding: 0 }
+ul.plain li { padding: 5px 0; border-bottom: 1px dashed var(--line); font-size: 14px }
+ul.plain li:last-child { border-bottom: 0 }
+.tag.pass { color: var(--accent); border: 1px solid var(--line); background: transparent }
+.planned { font-size: 12.5px; color: var(--green); font-weight: 600 }
+.card.flash { outline: 3px solid var(--gold); outline-offset: 2px }
+
+/* Budget */
+.bigmoney { font-family: var(--font-display); font-size: 30px; line-height: 1.1; color: var(--ink) }
+
+/* Planner */
+.days { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; margin-top: 16px }
+.day { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 14px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 8px; min-width: 0 }
+.day h3 { font-size: 17px; border-bottom: 1px solid var(--line); padding-bottom: 6px }
+.daylist li { display: flex; justify-content: space-between; gap: 6px; align-items: flex-start }
+.daylist li .t { flex: 1; min-width: 0 }
+.daylist li .btns { display: flex; gap: 3px; flex: none }
+.daylist li.warn { background: var(--dec-bg); border-radius: 6px; padding: 5px 6px }
+.warnmsg { color: var(--red); font-weight: 600; font-size: 12.5px }
+.day select, .day .daynote { font: inherit; font-size: 13px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); width: 100%; min-width: 0 }
+.daynote-ro { margin: 0; font-style: italic }
+
+/* Map */
+#map { height: min(70vh, 640px); margin-top: 16px; border-radius: var(--r); border: 1px solid var(--line); box-shadow: var(--shadow); background: var(--chip); z-index: 0 }
+.legend { background: var(--surface); color: var(--ink); padding: 8px 10px; border-radius: 8px; font: 12px/1.6 var(--font-body); box-shadow: var(--shadow) }
+.legend span { display: block; white-space: nowrap }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: middle }
+.homelabel { font: 600 12px var(--font-body); color: var(--ink); background: var(--surface); border: 1px solid var(--line) }
+.leaflet-popup-content { font: 13.5px/1.45 var(--font-body) }
+.leaflet-popup-content a { color: var(--accent) }
+
+/* Phrases */
+.phrasegroup { margin-top: 26px }
+.phrasegroup h2 { font-size: 24px; margin-bottom: 8px }
+.phrasegroup .dec { margin-bottom: 10px }
+.phrasegroup td.fr { font-family: var(--font-display); font-size: 17px; color: var(--ink); white-space: nowrap }
+.phrasegroup td.say { color: var(--gold); font-weight: 600; white-space: nowrap; font-size: 13px }
+@media (max-width: 560px) { .phrasegroup td.fr, .phrasegroup td.say { white-space: normal } }
+
+/* Lightbox */
+.lightbox { position: fixed; inset: 0; z-index: 50; background: rgba(12, 16, 30, .92); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 20px; cursor: zoom-out }
+.lightbox img { max-width: 100%; max-height: 85vh; border-radius: 6px; box-shadow: 0 10px 40px rgba(0,0,0,.6) }
+.lbcap { color: #fff; font-size: 13px } .lbcap a { color: #e2bf6a }
+.photo img { cursor: zoom-in }
+@media (max-width: 560px) { .tabs { gap: 2px } .tab { padding: 7px 10px; font-size: 13.5px } }

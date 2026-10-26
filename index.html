@@ -6,6 +6,7 @@
 <title>Fontainebleau Family Visit</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Instrument+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" crossorigin="">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -16,7 +17,7 @@
     <div>
       <div class="eyebrow">Fontainebleau · 10–22 December 2026</div>
       <h1>Everything we could do <em>while you're here</em></h1>
-      <p class="lede">This is a menu, not a schedule. Tap how much you want each thing (or each dish), star your top 5, and leave notes. Everyone's picks show up under <b>Family picks</b>, and Brendon will build the plan from there.</p>
+      <p class="lede">This is a menu, not a schedule. Tap how much you want each thing (or each dish), star your top 5, and leave notes. Everyone's picks show up under <b>Family picks</b>, and the draft schedule takes shape under <b>Plan</b>.</p>
     </div>
     <svg class="tower" viewBox="0 0 120 300" aria-hidden="true" focusable="false">
       <path d="M60 4 L63 40 L66 40 L66 56 L62 56 L72 120 L78 120 L78 132 L70 132 L84 200 L96 200 L96 214 L82 214 L112 290 L84 290 Q60 244 36 290 L8 290 L38 214 L24 214 L24 200 L36 200 L50 132 L42 132 L42 120 L48 120 L58 56 L54 56 L54 40 L57 40 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
@@ -41,6 +42,9 @@
     <div class="tabs" role="tablist">
       <button class="tab" role="tab" id="tab-browse" aria-selected="true">Browse &amp; vote</button>
       <button class="tab" role="tab" id="tab-results" aria-selected="false">Family picks</button>
+      <button class="tab" role="tab" id="tab-plan" aria-selected="false">Plan</button>
+      <button class="tab" role="tab" id="tab-map" aria-selected="false">Map</button>
+      <button class="tab" role="tab" id="tab-phrases" aria-selected="false">French</button>
     </div>
     <div class="who" id="who"><span class="dot" id="savedot"></span><span id="status">Connecting…</span></div>
   </div>
@@ -48,16 +52,22 @@
 
 <main class="wrap">
   <div id="notice" class="notice" hidden></div>
+
   <div id="view-browse">
     <div class="filters" id="filters"></div>
     <div id="areas"></div>
   </div>
+
   <div id="view-results" hidden>
     <div class="results">
       <div class="panel">
-        <h2>Group ranking</h2>
+        <h2>Who's voted</h2>
+        <div id="progress" class="person"></div>
+        <h2 style="margin-top:26px">Group ranking</h2>
         <p class="small">Points: Must do 3, Would like 2, Maybe 1, Skip −1, plus 2 for each top-5 star.</p>
         <div id="ranking"></div>
+        <h2 style="margin-top:26px">Where we agree, and don't</h2>
+        <div id="agree"></div>
         <h2 style="margin-top:26px">Notes</h2>
         <div id="notes" class="notes"></div>
       </div>
@@ -66,6 +76,8 @@
         <div id="mytop" class="mytop person"></div>
         <h2 style="margin-top:22px">Everyone's top 5</h2>
         <div id="people"></div>
+        <h2 style="margin-top:22px">Budget</h2>
+        <div id="budget"></div>
         <div class="ideas" style="margin-top:22px">
           <h2>Something missing?</h2>
           <p class="small" style="margin:0">Suggest anything you'd like added to the list.</p>
@@ -75,9 +87,29 @@
       </div>
     </div>
   </div>
-</main>
-<footer class="wrap"><span class="fleur" aria-hidden="true">⚜</span> Hours, dates and prices change. Prices were checked on official sites in October 2026; check each site before booking. Photos from <a href="https://commons.wikimedia.org" target="_blank" rel="noopener">Wikimedia Commons</a>; tap a photo credit to see its author and license.</footer>
 
+  <div id="view-plan" hidden>
+    <div class="area-head" style="margin-top:24px"><h2>Draft plan, day by day</h2><p id="plan-hint"></p></div>
+    <p class="small" style="margin:8px 0 0">Add anything from the list to a day. A ⚠ means that place is closed on that date. Food goes on days too, so meals can be planned around the sights.</p>
+    <div id="plan"></div>
+  </div>
+
+  <div id="view-map" hidden>
+    <div class="area-head" style="margin-top:24px"><h2>Where everything is</h2><p>Pins are colored by area. Tap one for the price and your rating. Fontainebleau is the white dot.</p></div>
+    <div id="map"></div>
+  </div>
+
+  <div id="view-phrases" hidden>
+    <div class="area-head" style="margin-top:24px"><h2>Useful French</h2><p>Nobody expects fluency. A Bonjour and a Merci get you a long way, and most people in Paris will switch to English once you've tried.</p></div>
+    <div id="phrases"></div>
+  </div>
+</main>
+
+<div id="lightbox" class="lightbox" hidden></div>
+
+<footer class="wrap"><span class="fleur" aria-hidden="true">⚜</span> Hours, dates and prices change. Prices were checked on official sites in October 2026; check each site before booking. Photos from <a href="https://commons.wikimedia.org" target="_blank" rel="noopener">Wikimedia Commons</a>; tap a photo to enlarge it, or its credit to see the author and license. Map data © OpenStreetMap contributors.</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" crossorigin=""></script>
 <script src="config.js"></script>
 <script src="activities.js"></script>
 <script src="app.js"></script>
