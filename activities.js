@@ -110,7 +110,7 @@ const ACTIVITIES = [
     blurb: "Built on the beach itself, with a B-26 bomber inside. Easy to pair with Sainte-Mère-Église.",
     dec: "Closed for its winter break until 14 Dec; reopens 15 Dec, 10:00–18:00. Tickets are sold online only." },
   { id: "arromanches", photo: "Arromanches-les-Bains_port_artificiel_Mulberry.jpg", area: "normandy", title: "Arromanches & the Mulberry harbor", travel: "3 h 15", time: "2 h", price: "€7 for the 360° cinema; D-Day museum €12.90", tags: ["ww2", "outdoor"],
-    blurb: "Remains of the artificial harbor still sit offshore. The 360° cinema on the cliff tells the story of the battle in a 20-minute film; the museum on the seafront explains the harbour.",
+    blurb: "Remains of the artificial harbor still sit offshore. The 360° cinema on the cliff tells the story of the battle in a 20-minute film; the museum on the seafront explains the harbor.",
     dec: "Cinema open 10:00–17:00 daily in December except Mondays 7 and 14 Dec and Christmas Day. A combined cinema + Caen Memorial ticket is €24. The museum closes 24, 25 and 31 Dec." },
   { id: "longues", photo: "Longues-sur-Mer_Battery.jpg", area: "normandy", title: "Longues-sur-Mer battery", travel: "3 h 15", time: "45 min", price: "Free", tags: ["ww2", "outdoor"],
     blurb: "The only German coastal battery that still has its original guns. Always open.",
