@@ -216,3 +216,9 @@ ul.plain li:last-child { border-bottom: 0 }
 .booktable select, .booktable input.ref { font: inherit; font-size: 13px; padding: 5px 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--ink); min-width: 120px }
 .booktable input.ref { width: 100%; min-width: 140px }
 #countdown { color: var(--gold) }
+
+/* Paid extras on cards */
+.extras { display: flex; flex-direction: column; gap: 3px; font-size: 13px }
+.extras .extra { display: flex; gap: 6px; align-items: center; cursor: pointer; color: var(--muted) }
+.extras .extra.on { color: var(--ink); font-weight: 600 }
+.extras input { accent-color: var(--accent) }

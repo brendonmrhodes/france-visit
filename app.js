@@ -42,7 +42,8 @@ function closedWarning(a, iso) {
 const ONLINE = !!(CONFIG.SCRIPT_URL || "").trim();
 const PLAN_KEY = "_plan";                 // reserved row in the Sheet that holds the draft plan
 const blank = () => ({ r: {}, note: {}, top: [], ideas: [] });
-const blankPlan = () => ({ days: {}, note: {}, booking: {} });
+const blankPlan = () => ({ days: {}, note: {}, booking: {}, options: {} });
+const chosen = (aid, oid) => ((plan.options || {})[aid] || []).includes(oid);
 let sortMode = load("fg-sort", "default");
 const BOOK_LABEL = { sellout: "Sells out: book the moment the day is fixed", advised: "Timed slot or online-only ticket" };
 const STATUS = ["Not booked", "Booked", "Confirmed"];
@@ -186,6 +187,16 @@ function card(a) {
   const c = el("article", { class: "card" + (a.closed ? " closed" : ""), id: "card-" + a.id }, photo(a),
     el("h3", { text: a.title }), meta, el("p", { class: "blurb", text: a.blurb }),
     food ? el("p", { class: "dec" }, el("b", { text: "Where: " }), a.where) : el("p", { class: "dec" }, el("b", { text: "In December: " }), a.dec), tags);
+  if (a.options && a.options.length) {
+    const ex = el("div", { class: "extras" }, el("span", { class: "small", text: "Paid extras (tick what we'd actually do):" }));
+    for (const o of a.options) {
+      const cb = el("input", { type: "checkbox", id: "opt-" + a.id + "-" + o.id, disabled: !canWrite() });
+      cb.checked = chosen(a.id, o.id);
+      cb.addEventListener("change", () => { const cur = new Set((plan.options || (plan.options = {}))[a.id] || []); cb.checked ? cur.add(o.id) : cur.delete(o.id); plan.options[a.id] = [...cur]; queuePlanSave(); render() });
+      ex.append(el("label", { for: cb.id, class: "extra" + (cb.checked ? " on" : "") }, cb, ` ${o.label} · ${euro(o.price)}${o.perGroup ? " shared" : " each"}${o.pass ? " · Museum Pass" : ""}`));
+    }
+    c.append(ex);
+  }
   const on = plannedOn(a.id);
   if (on.length) c.append(el("div", { class: "planned", text: "In the plan: " + on.map(fmtDay).join(", ") + bookBadge(a.id) }));
   if (!a.closed) {
@@ -344,9 +355,14 @@ function renderResults() {
 const ADULT_OPTIONS = CONFIG.ADULT_OPTIONS || [{ n: CONFIG.ADULTS || CONFIG.FAMILY.length, label: "everyone" }];
 let TRAVELERS = load("fg-adults", ADULT_OPTIONS[ADULT_OPTIONS.length - 1].n);
 function costOf(ids) {
-  let perPerson = 0, group = 0, passable = 0;
-  for (const id of ids) { const a = byId[id]; if (!a || !a.budget) continue; if (a.perGroup) group += a.budget; else { perPerson += a.budget; if (typeof PASS !== "undefined" && PASS.covers.includes(id)) passable += a.budget } }
-  return { perPerson, group, passable, total: perPerson * TRAVELERS + group };
+  let perPerson = 0, group = 0, passable = 0, extras = 0;
+  const covered = id => typeof PASS !== "undefined" && PASS.covers.includes(id);
+  for (const id of ids) {
+    const a = byId[id]; if (!a) continue;
+    if (a.budget) { if (a.perGroup) group += a.budget; else { perPerson += a.budget; if (covered(id)) passable += a.budget } }
+    for (const o of a.options || []) { if (!chosen(id, o.id)) continue; extras++; if (o.perGroup) group += o.price; else { perPerson += o.price; if (o.pass) passable += o.price } }
+  }
+  return { perPerson, group, passable, extras, total: perPerson * TRAVELERS + group };
 }
 function renderBudget(votes, rows) {
   const b = $("#budget"); b.replaceChildren();
@@ -361,7 +377,7 @@ function renderBudget(votes, rows) {
     const c = costOf(ids);
     const box = el("div", { class: "person budgetbox" }, el("h3", { text: title }), el("p", { class: "small", style: "margin:0 0 4px", text: sub }));
     if (!ids.length) { box.append(el("p", { class: "small", style: "margin:0", text: "Nothing to add up yet." })); return box }
-    box.append(el("div", { class: "bigmoney", text: euro(c.total) }), el("p", { class: "small", style: "margin:2px 0 0", text: `${euro(c.perPerson)} per person × ${TRAVELERS}` + (c.group ? ` + ${euro(c.group)} shared (guide, parking)` : "") + ` · ${ids.length} items` }));
+    box.append(el("div", { class: "bigmoney", text: euro(c.total) }), el("p", { class: "small", style: "margin:2px 0 0", text: `${euro(c.perPerson)} per person × ${TRAVELERS}` + (c.group ? ` + ${euro(c.group)} shared (guide, parking)` : "") + ` · ${ids.length} items` + (c.extras ? ` · ${c.extras} paid extra${c.extras === 1 ? "" : "s"} ticked` : "") }));
     if (typeof PASS !== "undefined" && c.passable) {
       const best = PASS.prices.slice().sort((x, y) => x.price - y.price).find(p => p.price < c.passable);
       box.append(el("p", { class: "small", style: "margin:6px 0 0", text: `${euro(c.passable)} of that is at Museum Pass sites. ` + (best ? `A ${best.days}-day pass (${euro(best.price)}) would save about ${euro(c.passable - best.price)} per person if those visits fit in ${best.days} consecutive days.` : "That's less than the cheapest pass, so pay per ticket.") }));
@@ -369,7 +385,7 @@ function renderBudget(votes, rows) {
     return box;
   };
   const normandyDays = DAYS.filter(d => (plan.days[d] || []).some(id => byId[id] && byId[id].area === "normandy")).length;
-  if (typeof CAR !== "undefined" && normandyDays) b.append(el("div", { class: "person budgetbox" }, el("h3", { text: "Rental car" }), el("div", { class: "bigmoney", text: euro(CAR.estimatePerDay * Math.max(3, normandyDays)) }), el("p", { class: "small", style: "margin:2px 0 0", text: `About ${euro(CAR.estimatePerDay)} a day for a 7-seat automatic with a car seat, times ${Math.max(3, normandyDays)} days (minimum 3), shared. Fuel and tolls extra, roughly ${euro(CAR.fuelTolls)} for the Normandy loop.` })));
+  if (typeof CAR !== "undefined" && normandyDays) b.append(el("div", { class: "person budgetbox" }, el("h3", { text: "Rental car" }), el("div", { class: "bigmoney", text: euro(CAR.estimatePerDay * Math.max(3, normandyDays)) }), el("p", { class: "small", style: "margin:2px 0 0", text: `About ${euro(CAR.estimatePerDay)} a day for a 7-seat automatic, times ${Math.max(3, normandyDays)} days (minimum 3), shared. Fuel and tolls extra, roughly ${euro(CAR.fuelTolls)} for the Normandy loop.` })));
   b.append(line("The draft plan", planned, "Everything currently on the Plan tab, per-person prices times " + TRAVELERS + "."),
     line("Every Must do", musts, "Everything at least one person rated Must do or Must try."));
   if (typeof PASS !== "undefined") {
