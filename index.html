@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fontainebleau Family Visit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Instrument+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top wrap">
+  <div class="eyebrow">Fontainebleau · 10–22 December 2026</div>
+  <h1>Everything we could do while you're here</h1>
+  <p class="lede">This is a menu, not a schedule. Tap how much you want each thing, star your top 5, and leave notes. Everyone's picks show up under <b>Family picks</b>, and Brendon will build the plan from there.</p>
+  <div class="facts">
+    <div class="fact"><b>Short days</b>Sunrise around 8:40, sunset around 16:55. Plan outdoor sights for midday.</div>
+    <div class="fact"><b>Paris is easy</b>Fontainebleau-Avon to Paris Gare de Lyon: about 40 min on the Transilien R train.</div>
+    <div class="fact"><b>Museum closing days</b>Louvre, Orangerie and Château de Fontainebleau close Tuesdays. Orsay and Versailles close Mondays.</div>
+    <div class="fact"><b>Crowds rise Dec 19</b>Paris school holidays start Saturday 19 December. Book big sights before then if possible.</div>
+  </div>
+</header>
+
+<div class="bar">
+  <div class="wrap">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tab-browse" aria-selected="true">Browse &amp; vote</button>
+      <button class="tab" role="tab" id="tab-results" aria-selected="false">Family picks</button>
+    </div>
+    <div class="who" id="who"><span class="dot" id="savedot"></span><span id="status">Connecting…</span></div>
+  </div>
+</div>
+
+<main class="wrap">
+  <div id="notice" class="notice" hidden></div>
+  <div id="view-browse">
+    <div class="filters" id="filters"></div>
+    <div id="areas"></div>
+  </div>
+  <div id="view-results" hidden>
+    <div class="results">
+      <div class="panel">
+        <h2>Group ranking</h2>
+        <p class="small">Points: Must do 3, Would like 2, Maybe 1, Skip −1, plus 2 for each top-5 star.</p>
+        <div id="ranking"></div>
+        <h2 style="margin-top:26px">Notes</h2>
+        <div id="notes" class="notes"></div>
+      </div>
+      <div class="panel">
+        <h2>My top 5</h2>
+        <div id="mytop" class="mytop person"></div>
+        <h2 style="margin-top:22px">Everyone's top 5</h2>
+        <div id="people"></div>
+        <div class="ideas" style="margin-top:22px">
+          <h2>Something missing?</h2>
+          <p class="small" style="margin:0">Suggest anything you'd like added to the list.</p>
+          <form id="ideaform"><input id="ideainput" maxlength="200" placeholder="e.g. A cooking class in Paris"><button class="primary" type="submit">Add</button></form>
+          <div id="ideas" style="margin-top:10px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<footer class="wrap">Hours and dates change. Check each official site before booking. Photos from <a href="https://commons.wikimedia.org" target="_blank" rel="noopener">Wikimedia Commons</a>; tap a photo credit to see its author and license.</footer>
+
+<script src="config.js"></script>
+<script src="activities.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
